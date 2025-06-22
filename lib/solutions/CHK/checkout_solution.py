@@ -126,18 +126,28 @@ class CheckoutSolution:
         for sku, count in sku_count.items():
             if sku in self.offer_dict:
                 free_offers = [offer for offer in self.offer_dict[sku] if offer['type'] == 'free']
+
                 for offer in free_offers:
-                    free_sets = count // offer['buy_quantity']
-                    if free_sets > 0:
-                        free_item = offer.get('free_item')
-                        free_quantity = free_sets * offer.get('free_quantity', 0)
+                    buy_quantity = offer.get('buy_quantity', 0)
+                    free_item = offer.get('free_item')
+                    free_quantity_per_set = offer.get('free_quantity', 0)
+                    if free_item and buy_quantity > 0 and free_quantity_per_set > 0:
+                        max_sets_from_trigger = count // buy_quantity
 
-                        if free_item and free_quantity > 0:
+                        if max_sets_from_trigger > 0:
+                            total_free_needed = max_sets_from_trigger * free_quantity_per_set
                             available_free_items = sku_count.get(free_item, 0)
-                            actual_free_quantity = min(free_quantity, available_free_items)
 
+                            if free_item == sku:
+                                total_tiems_needed = max_sets_from_trigger * buy_quantity + total_free_needed
+                                actual_sets = min(max_sets_from_trigger, count // (buy_quantity + free_quantity_per_set))
+                                actual_free_quantity = actual_sets * free_quantity_per_set
+                            else:
+                                actual_free_quantity = min(total_free_needed, available_free_items)
+                            
                             if actual_free_quantity > 0:
                                 free_items[free_item] = free_items.get(free_item, 0) + actual_free_quantity
         
         return free_items
             
+

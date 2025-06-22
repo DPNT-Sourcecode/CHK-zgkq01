@@ -1,7 +1,7 @@
-from typing import Dict
-
-
 class CheckoutSolution:
+    """
+    Added more modular code to class
+    """
 
     def __init__(self):
         self.price_dict = {
@@ -62,7 +62,7 @@ class CheckoutSolution:
         return total_price
 
 
-    def count_skus(self, skus: str) -> Dict[str]:
+    def count_skus(self, skus: str):
         """
         Count how many of each sku there is
         """
@@ -128,4 +128,5 @@ class CheckoutSolution:
         
         return free_items
             
+
 

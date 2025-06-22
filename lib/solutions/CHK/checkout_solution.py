@@ -17,7 +17,7 @@ class CheckoutSolution:
             'A': [{'type' : 'bulk', 'quantity': 5, 'price': 200},
                   {'type' : 'bulk', 'quantity': 3, 'price': 130}],
 
-            'B': [{'type' : 'bulk', 'quantity': 25, 'price': 45}],
+            'B': [{'type' : 'bulk', 'quantity': 2, 'price': 45}],
 
             'E': [{'type' : 'free', 'buy_quantity': 2, 'free_item': 'B', 'free_quantity': 1}],
 
@@ -141,6 +141,7 @@ class CheckoutSolution:
         
         return free_items
             
+
 
 
 

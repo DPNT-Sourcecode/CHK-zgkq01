@@ -100,12 +100,16 @@ class CheckoutSolution:
         for sku, free_count in free_items.items():
             if sku in adjusted_count:
                 adjusted_count[sku] = max(0, adjusted_count[sku] - free_count)
+
+        group_discount, adjusted_count = self.apply_group_offers(adjusted_count)
         
         total_price = 0
         for sku, count in adjusted_count.items():
             if count > 0:
                 cost, _ = self.apply_bulk_offers(sku, count)
                 total_price += cost
+
+        total_price -= group_discount
 
         return total_price
 
@@ -228,4 +232,5 @@ class CheckoutSolution:
         
         return free_items
             
+
 

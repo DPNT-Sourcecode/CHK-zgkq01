@@ -39,6 +39,9 @@ class CheckoutSolution:
         if not isinstance(skus, str):
             return -1
         
+        if not skus:
+            return -1
+        
         sku_count = self.count_skus(skus)
         if sku_count is None:
             return -1
@@ -111,20 +114,25 @@ class CheckoutSolution:
         """
         free_items = {}
 
+        if not sku_count:
+            return free_items
+
         for sku, count in sku_count.items():
             if sku in self.offer_dict:
                 free_offers = [offer for offer in self.offer_dict[sku] if offer['type'] == 'free']
                 for offer in free_offers:
                     free_sets = count // offer['buy_quantity']
                     if free_sets > 0:
-                        free_item = offer['free_item']
-                        free_quantity = free_sets * offer['free_quantity']
-        
-        available_free_items = sku_count.get(free_item, 0)
-        actual_free_quantity = min(free_quantity, available_free_items)
+                        free_item = offer.get('free_item')
+                        free_quantity = free_sets * offer.get('free_quantity', 0)
 
-        if actual_free_quantity > 0:
-            free_items[free_item] = free_items.get(free_item, 0) + actual_free_quantity
+                        if free_item and free_quantity > 0:
+                            available_free_items = sku_count.get(free_item, 0)
+                            actual_free_quantity = min(free_quantity, available_free_items)
+
+                            if actual_free_quantity > 0:
+                                free_items[free_item] = free_items.get(free_item, 0) + actual_free_quantity
         
         return free_items
             
+

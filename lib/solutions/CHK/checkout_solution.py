@@ -10,8 +10,29 @@ class CheckoutSolution:
             'C': 20,
             'D': 15,
             'E': 40,
-            'F': 10
-            }
+            'F': 10,
+            'G': 20,
+            'H': 10,
+            'I': 35,
+            'J': 60,
+            'K': 80,
+            'L': 90,
+            'M': 15,
+            'N': 40,
+            'O': 10,
+            'P': 50,
+            'Q': 30,
+            'R': 50,
+            'S': 30,
+            'T': 20,
+            'U': 40,
+            'V': 50,
+            'W': 20,
+            'X': 90,
+            'Y': 10,
+            'Z': 50
+
+        }
         
         self.offer_dict = {
             'A': [{'type' : 'bulk', 'quantity': 5, 'price': 200},
@@ -22,6 +43,25 @@ class CheckoutSolution:
             'E': [{'type' : 'free', 'buy_quantity': 2, 'free_item': 'B', 'free_quantity': 1}],
 
             'F': [{'type' : 'free', 'buy_quantity': 2, 'free_item': 'F', 'free_quantity': 1}],
+
+            'H': [{'type' : 'bulk', 'quantity': 10, 'price': 80},
+                  {'type' : 'bulk', 'quantity': 5, 'price': 45}],
+            
+            'K': [{'type' : 'bulk', 'quantity': 2, 'price': 150}],
+
+            'P': [{'type' : 'bulk', 'quantity': 5, 'price': 200}],
+
+            'Q': [{'type' : 'bulk', 'quantity': 3, 'price': 80}],
+
+            'V': [{'type' : 'bulk', 'quantity': 3, 'price': 130},
+                  {'type' : 'bulk', 'quantity': 2, 'price': 90}],
+            
+            'N': [{'type' : 'free', 'buy_quantity': 3, 'free_item': 'M', 'free_quantity': 1}],
+
+            'R': [{'type' : 'free', 'buy_quantity': 3, 'free_item': 'Q', 'free_quantity': 1}],
+
+            'U': [{'type' : 'free', 'buy_quantity': 3, 'free_item': 'U', 'free_quantity': 1}],
+            
             
             }
         
@@ -150,4 +190,5 @@ class CheckoutSolution:
         
         return free_items
             
+
 

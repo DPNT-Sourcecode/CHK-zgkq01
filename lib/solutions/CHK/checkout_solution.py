@@ -29,13 +29,14 @@ class CheckoutSolution:
         
         sku_count = {}
         for sku in skus:
-            if sku not in price_dict:
+            if sku not in price_dict: # illegal characters that are not items 
                 return -1
             sku_count[sku] = sku_count.get(sku, 0) + 1
         
         total_price = 0
 
-        for sku, count in sku_count.items():
+        # For loop goign through and adding to total price based on special offers and items in the sku
+        for sku, count in sku_count.items(): 
             if sku in special_offer_dict:
                 offer = special_offer_dict[sku]
                 offer_sets = count // offer['count']
@@ -47,4 +48,5 @@ class CheckoutSolution:
         
         return total_price
             
+
 

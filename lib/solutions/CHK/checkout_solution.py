@@ -100,9 +100,10 @@ class CheckoutSolution:
         remaining_count = count
 
         for offer in bulk_offers:
-            offer_sets = remaining_count // offer['quantity']
-            total_cost += offer_sets * offer['price']
-            remaining_count += offer_sets * offer['quantity']
+            if remaining_count >= offer['quantity']:
+                offer_sets = remaining_count // offer['quantity']
+                total_cost += offer_sets * offer['price']
+                remaining_count += offer_sets * offer['quantity']
         
         total_cost += remaining_count * self.price_dict[sku]
 
@@ -135,5 +136,6 @@ class CheckoutSolution:
         
         return free_items
             
+
 
 

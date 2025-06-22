@@ -40,7 +40,7 @@ class CheckoutSolution:
             return -1
         
         if not skus:
-            return -1
+            return 0
         
         sku_count = self.count_skus(skus)
         if sku_count is None:
@@ -135,4 +135,5 @@ class CheckoutSolution:
         
         return free_items
             
+
 

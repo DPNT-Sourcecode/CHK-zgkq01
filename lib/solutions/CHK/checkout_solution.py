@@ -101,15 +101,14 @@ class CheckoutSolution:
             if sku in adjusted_count:
                 adjusted_count[sku] = max(0, adjusted_count[sku] - free_count)
 
-        group_discount, adjusted_count = self.apply_group_offers(adjusted_count)
+        group_cost, adjusted_count = self.apply_group_offers(adjusted_count)
         
-        total_price = 0
+        total_price = group_cost
         for sku, count in adjusted_count.items():
             if count > 0:
                 cost, _ = self.apply_bulk_offers(sku, count)
                 total_price += cost
 
-        total_price -= group_discount
 
         return total_price
 
@@ -165,7 +164,7 @@ class CheckoutSolution:
         """
         Apply group discount offers
         """
-        total_group_discount = 0
+        total_group_cost = 0
         adjusted_count = sku_count.copy()
 
         for group_offer in self.group_offer_dict:
@@ -185,16 +184,12 @@ class CheckoutSolution:
             for _ in range(group_possible):
                 group_items_used = available_items[:required_quantity]
                 available_items = available_items[required_quantity:]
-                individual_cost = sum(self.price_dict[item] for item in group_items_used)
-                savings = individual_cost - group_price
+                total_group_cost += group_price
 
-                if savings > 0:
-                    total_group_discount += savings
-
-                    for item in group_items_used:
-                        adjusted_count[item] -= 1
+                for item in group_items_used:
+                    adjusted_count[item] -= 1
         
-        return total_group_discount, adjusted_count
+        return total_group_cost, adjusted_count
     
     def calculate_free_items(self, sku_count):
         """
@@ -232,5 +227,6 @@ class CheckoutSolution:
         
         return free_items
             
+
 
 

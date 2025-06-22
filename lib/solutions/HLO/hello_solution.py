@@ -7,6 +7,6 @@ class HelloSolution:
             raise ValueError(f" Friend Name : {friend_name} is not a string")
 
         if friend_name:
-            return f"Hello {friend_name}!"
+            return f"Hello, {friend_name}!"
         else:
             return "No friend name given!"

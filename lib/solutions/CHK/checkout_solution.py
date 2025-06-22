@@ -1,6 +1,30 @@
+from typing import Dict
+
 
 class CheckoutSolution:
 
+    def __init__(self):
+        self.price_dict = {
+            'A': 50,
+            'B': 30,
+            'C': 20,
+            'D': 15,
+            'E': 40,
+            'F': 10
+            }
+        
+        self.offer_dict = {
+            'A': [{'type' : 'bulk', 'quantity': 5, 'price': 200},
+                  {'type' : 'bulk', 'quantity': 3, 'price': 130}],
+
+            'B': [{'type' : 'bulk', 'quantity': 25, 'price': 45}],
+
+            'E': [{'type' : 'free', 'buy_quantity': 2, 'free_item': 'B', 'free_quantity': 1}],
+
+            'F': [{'type' : 'free', 'buy_quantity': 2, 'free_item': 'F', 'free_quantity': 1}],
+            
+            }
+        
     # skus = unicode string
     def checkout(self, skus : str) -> int:
         """
@@ -15,66 +39,93 @@ class CheckoutSolution:
         if not isinstance(skus, str):
             return -1
         
-        price_dict = {
-            'A': 50,
-            'B': 30,
-            'C': 20,
-            'D': 15,
-            'E': 40
-            }
-            
-        sku_count = {}
-        for sku in skus:
-            if sku not in price_dict: # illegal characters that are not items 
-                return -1
-            sku_count[sku] = sku_count.get(sku, 0) + 1
+        sku_count = self.count_skus(skus)
+        if sku_count is None:
+            return -1
+        
+        if not sku_count:
+            return -1
+        
+        free_items = self.calculate_free_items(sku_count)
+
+        adjusted_count = sku_count.copy()
+        for sku, free_count in free_items.items():
+            if sku in adjusted_count:
+                adjusted_count[sku] = max(0, adjusted_count[sku] - free_count)
         
         total_price = 0
+        for sku, count in adjusted_count.items():
+            if count > 0:
+                cost, _ = self.apply_bulk_offers(sku, count)
+                total_price += cost
 
-        # Fidning best offer based on basket, 5A for 200 is better than 3A for 130 therefore we handle 5A offers on priority
-        if 'A' in sku_count:
-            a_count = sku_count['A']
-            offer_5a = a_count // 5
-            rem_a = a_count % 5
-            offer_3a = rem_a // 3
-            final_rem_a = rem_a % 3
-
-            total_price += offer_5a * 200
-            total_price += offer_3a * 130
-            total_price += final_rem_a * 50
-
-        # E offers, if 2 Es are bought we add to the free B
-        count_free_B = 0
-        if 'E' in sku_count:
-            e_count = sku_count['E']
-            count_free_B = e_count // 2
-
-            total_price += e_count * 40
-
-        #B Handling with offers and with the E offer for free Bs
-        if 'B' in sku_count:
-            b_count = sku_count['B']
-            end_b_count = max(0, b_count - count_free_B) # Handling by removing free B from the E offer
-
-            offer_2b = end_b_count // 2
-            rem_b = end_b_count % 2
-
-            total_price += offer_2b * 45
-            total_price += rem_b * 30
-
-
-        if 'C' in sku_count:
-            c_count = sku_count['C']
-            
-            total_price += c_count * 20
-
-        if 'D' in sku_count:
-            d_count = sku_count['D']
-            
-            total_price += d_count * 15
-            
-        
-
-        
         return total_price
+
+
+    def count_skus(self, skus: str) -> Dict[str]:
+        """
+        Count how many of each sku there is
+        """
+
+        sku_count = {}
+
+        for sku in skus:
+            if sku not in self.price_dict:
+                return None
             
+            sku_count[sku] = sku_count.get(sku, 0) + 1
+
+        return sku_count
+    
+
+    def apply_bulk_offers(self, sku, count):
+        """
+        Apply bulk discount offers such as 2B for 45 etc...
+        """
+
+        if sku not in self.offer_dict:
+            return count * self.price_dict[sku], 0
+        
+        bulk_offers = [offer for offer in self.offer_dict[sku] if offer['type'] == 'bulk']
+
+        if not bulk_offers:
+            return count * self.price_dict[sku], 0
+        
+        bulk_offers.sort(key=lambda x: x['quantity'], reverse=True)
+
+        total_cost = 0
+        remaining_count = count
+
+        for offer in bulk_offers:
+            offer_sets = remaining_count // offer['quantity']
+            total_cost += offer_sets * offer['price']
+            remaining_count += offer_sets * offer['quantity']
+        
+        total_cost += remaining_count * self.price_dict[sku]
+
+        return total_cost, 0
+    
+    def calculate_free_items(self, sku_count):
+        """
+        Calculate free items from free item offers such as 1 F free for 2F
+        """
+        free_items = {}
+
+        for sku, count in sku_count.items():
+            if sku in self.offer_dict:
+                free_offers = [offer for offer in self.offer_dict[sku] if offer['type'] == 'free']
+                for offer in free_offers:
+                    free_sets = count // offer['buy_quantity']
+                    if free_sets > 0:
+                        free_item = offer['free_item']
+                        free_quantity = free_sets * offer['free_quantity']
+        
+        available_free_items = sku_count.get(free_item, 0)
+        actual_free_quantity = min(free_quantity, available_free_items)
+
+        if actual_free_quantity > 0:
+            free_items[free_item] = free_items.get(free_item, 0) + actual_free_quantity
+        
+        return free_items
+            
+

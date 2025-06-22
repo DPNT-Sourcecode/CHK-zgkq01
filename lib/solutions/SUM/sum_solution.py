@@ -7,4 +7,3 @@ class SumSolution:
         
         return x + y
             
-

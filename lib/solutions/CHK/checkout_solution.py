@@ -141,8 +141,3 @@ class CheckoutSolution:
         
         return free_items
             
-
-
-
-
-

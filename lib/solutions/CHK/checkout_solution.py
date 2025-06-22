@@ -94,20 +94,25 @@ class CheckoutSolution:
         if not bulk_offers:
             return count * self.price_dict[sku], 0
         
-        bulk_offers.sort(key=lambda x: x['quantity'], reverse=True)
+        minimum_cost_for_quantity = [float('inf')] * (count + 1)
+        minimum_cost_for_quantity[0] = 0
 
-        total_cost = 0
-        remaining_count = count
-
-        for offer in bulk_offers:
-            if remaining_count >= offer['quantity']:
-                offer_sets = remaining_count // offer['quantity']
-                total_cost += offer_sets * offer['price']
-                remaining_count += offer_sets * offer['quantity']
+        for current_quantity in range(1, count+1):
+            minimum_cost_for_quantity[current_quantity] = minimum_cost_for_quantity[current_quantity - 1] + self.price_dict[sku]
         
-        total_cost += remaining_count * self.price_dict[sku]
+            for bulk_offer in bulk_offers:
+                offer_quantity = bulk_offer['quantity']
+                offer_price = bulk_offer['price']
 
-        return total_cost, 0
+                if current_quantity >= offer_quantity:
+                    remaining_quantity = current_quantity - offer_quantity
+                    cost_with_this_offer = minimum_cost_for_quantity[remaining_quantity] + offer_price
+                    minimum_cost_for_quantity[current_quantity] = min(minimum_cost_for_quantity[current_quantity], cost_with_this_offer)
+        
+        return minimum_cost_for_quantity[count], 0
+    
+
+       
     
     def calculate_free_items(self, sku_count):
         """
@@ -136,6 +141,7 @@ class CheckoutSolution:
         
         return free_items
             
+
 
 
 

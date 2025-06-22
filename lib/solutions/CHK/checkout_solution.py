@@ -15,7 +15,7 @@ class CheckoutSolution:
             'H': 10,
             'I': 35,
             'J': 60,
-            'K': 80,
+            'K': 70,
             'L': 90,
             'M': 15,
             'N': 40,
@@ -23,14 +23,14 @@ class CheckoutSolution:
             'P': 50,
             'Q': 30,
             'R': 50,
-            'S': 30,
+            'S': 20,
             'T': 20,
             'U': 40,
             'V': 50,
             'W': 20,
-            'X': 90,
-            'Y': 10,
-            'Z': 50
+            'X': 17,
+            'Y': 20,
+            'Z': 21
 
         }
         
@@ -47,7 +47,7 @@ class CheckoutSolution:
             'H': [{'type' : 'bulk', 'quantity': 10, 'price': 80},
                   {'type' : 'bulk', 'quantity': 5, 'price': 45}],
             
-            'K': [{'type' : 'bulk', 'quantity': 2, 'price': 150}],
+            'K': [{'type' : 'bulk', 'quantity': 2, 'price': 120}],
 
             'P': [{'type' : 'bulk', 'quantity': 5, 'price': 200}],
 
@@ -62,8 +62,13 @@ class CheckoutSolution:
 
             'U': [{'type' : 'free', 'buy_quantity': 3, 'free_item': 'U', 'free_quantity': 1}],
             
-            
             }
+        
+        self.group_offer_dict = [{
+            'items' : ['S', 'T', 'X', 'Y', 'Z'],
+            'quantity': 3,
+            'price': 45
+        }]
         
     # skus = unicode string
     def checkout(self, skus : str) -> int:
@@ -152,7 +157,40 @@ class CheckoutSolution:
         return minimum_cost_for_quantity[count], 0
     
 
-       
+    def apply_group_offers(self, sku_count):
+        """
+        Apply group discount offers
+        """
+        total_group_discount = 0
+        adjusted_count = sku_count.copy()
+
+        for group_offer in self.group_offer_dict:
+            group_items = group_offer['items']
+            required_quantity = group_offer['quantity']
+            group_price = group_offer['price']
+
+            available_items = []
+            for item in group_items:
+                count = adjusted_count.get(item, 0)
+                for _ in range(count):
+                    available_items.append(item)
+
+            available_items.sort(key=lambda x: self.price_dict[x], reverse=True)
+            group_possible = len(available_items) // required_quantity
+
+            for _ in range(group_possible):
+                group_items_used = available_items[:required_quantity]
+                available_items = available_items[required_quantity:]
+                individual_cost = sum(self.price_dict[item] for item in group_items_used)
+                savings = individual_cost - group_price
+
+                if savings > 0:
+                    total_group_discount += savings
+
+                    for item in group_items_used:
+                        adjusted_count[item] -= 1
+        
+        return total_group_discount, adjusted_count
     
     def calculate_free_items(self, sku_count):
         """
@@ -190,3 +228,4 @@ class CheckoutSolution:
         
         return free_items
             
+
